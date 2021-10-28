@@ -45,7 +45,17 @@ export default {
   ],
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
+  vue: {
+    config: {
+      productionTip: false,
+      devtools: true
+    }
+  },
   build: {
+    devtools: true,
+    extend(config) {
+      config.devtool = 'source-map'
+    },
   },
 
   render: {
