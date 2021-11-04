@@ -7,8 +7,8 @@ export const useComposable = () => {
   const decrement = () => counter.value--
 
   const fetchData = (useHero: boolean = false) => simulateApi(useHero)
-  const fnThatBreaksAsyncData = () => {
-    const { isDev } = useContext()
+  const fnThatBreaksAsyncData = (context?: any) => {
+    const { isDev } = context || useContext()
     return isDev
   }
 
@@ -24,5 +24,5 @@ function getRandomInt(min: number, max: number) {
 
 function simulateApi(useHero: boolean = false) {
   const heros = ['iron man', 'captain america', 'black panther']
-  return Promise.resolve({ user: { name: useHero ? heros[getRandomInt(0, heros.length - 1)] : 'i am not a hero' } })
+  return Promise.resolve({ user: { name: useHero ? heros[getRandomInt(0, heros.length - 1)] : 'i am not a hero', coucou: { foo: 'bar' } } })
 }

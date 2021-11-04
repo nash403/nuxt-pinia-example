@@ -8,7 +8,6 @@
     {{'asyncData user:'}} <pre>{{ user }}</pre>
     <hr>
     {{'userNameWithCount:'}} <pre>"{{ userNameWithCount }}"</pre>
-    <hr>
     <div>
       <p>Counter : {{ counter }}</p>
       <button @click="increment">
@@ -83,6 +82,7 @@ export default defineComponent({
     // and useContext can only be called in the setup function.
     // Uncomment for demo.
     // composable.fnThatBreaksAsyncData()
+    // composable.fnThatBreaksAsyncData({ isDev: false }) // with a default param we can avoid the failure
 
     const { user } = await composable.fetchData()
     return { user }
