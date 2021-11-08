@@ -7,6 +7,8 @@
     <hr>
     {{'asyncData user:'}} <pre>{{ user }}</pre>
     <hr>
+    {{'store user:'}} <pre>{{ aStore.userFromApi }}</pre>
+    <hr>
     {{'userNameWithCount:'}} <pre>"{{ userNameWithCount }}"</pre>
     <div>
       <p>Counter : {{ counter }}</p>
@@ -75,8 +77,9 @@ export default defineComponent({
       changeUser,
     }
   },
-  async asyncData () {
+  async asyncData ({ $pinia }) {
     const composable = useComposable()
+    const store = useStore($pinia)
 
     // The following commented call breaks asyncData because useContext is used in the implementation,
     // and useContext can only be called in the setup function.
@@ -85,6 +88,7 @@ export default defineComponent({
     // composable.fnThatBreaksAsyncData({ isDev: false }) // with a default param we can avoid the failure
 
     const { user } = await composable.fetchData()
+    store.userFromApi = user
     return { user }
   }
 })
