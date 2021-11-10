@@ -33,8 +33,7 @@ export default {
     // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
     '@nuxtjs/composition-api/module',
-    // ['@pinia/nuxt', { disableVuex: false }],
-    ['~/modules/pinia-nuxt', { disableVuex: false }],
+    ['@pinia/nuxt', { disableVuex: false }],
     // https://go.nuxtjs.dev/stylelint
     '@nuxtjs/stylelint-module',
     // https://go.nuxtjs.dev/tailwindcss
