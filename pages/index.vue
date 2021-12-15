@@ -7,7 +7,12 @@
     <hr>
     {{'asyncData user:'}} <pre>{{ user }}</pre>
     <hr>
-    {{'store user:'}} <pre>{{ aStore.userFromApi }}</pre>
+    <div>
+      <p>{{'store user:'}} <pre>{{ aStore.userFromApi }}</pre></p>
+      <button @click="changeStoreUser">
+        change store username
+      </button>
+    </div>
     <hr>
     {{'userNameWithCount:'}} <pre>"{{ userNameWithCount }}"</pre>
     <div>
@@ -35,6 +40,14 @@ import { useComposable } from "~/domain/composable";
 
 const myGlobalRef = ssrRef('my-ref-value') // to test cross-user server state pollution
 
+const useVmData = () => { // helper composable for current instance data
+  const vm = getCurrentInstance()
+  return {
+    vm,
+    vmData: computed(() => vm?.data || {})
+  }
+}
+
 export default defineComponent({
   setup() {
     const aStore = useStore()
@@ -48,23 +61,25 @@ export default defineComponent({
       aStore.setString(route.value.query.ref as string)
     }
 
-    const vm = getCurrentInstance() // to get info returned from asyncData
+    const { vmData } = useVmData() // to get info returned from asyncData
 
     // example of computed with data coming from asyncData
     const userNameWithCount = computed(() => {
-      const userName = (vm?.data?.user as any)?.name // fields of vm.data will not be properly typed so the cast is necessary
+      const userName = (vmData.value.user as any)?.name // fields of vm.data will not be properly typed so the cast is necessary
       return `${userName} (count: ${counter.value})`
     })
 
     // method that changes data from asyncData to demonstrate that the computed works fine
     const changeUser = async () => {
-      if (vm) {
+      const { user } = await fetchData(true)
+      vmData.value.user = user
+      console.log(`user changed to ${user.name}`)
+    }
+
+    const changeStoreUser = async () => {
         const { user } = await fetchData(true)
-        vm.data.user = user
-        console.log(`user changed to ${user.name}`)
-      } else {
-        console.error('something went wrong, this should not arrive in normal execution flow')
-      }
+        aStore.userFromApi = user
+        console.log(`user store changed to ${user.name}`)
     }
 
     return {
@@ -75,6 +90,7 @@ export default defineComponent({
       decrement,
       userNameWithCount,
       changeUser,
+      changeStoreUser,
     }
   },
   async asyncData ({ $pinia }) {
