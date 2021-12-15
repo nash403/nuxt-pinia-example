@@ -1,5 +1,11 @@
 <template>
 <div>
+  <h1>Home page</h1>
+  <p>
+    <NuxtLink to="/other">
+      Other page (internal link that belongs to the Nuxt App)
+    </NuxtLink>
+  </p>
   <div>
     {{'myGlobalRef:'}} <pre>{{ myGlobalRef }}</pre>
     <hr>
@@ -103,9 +109,11 @@ export default defineComponent({
     // composable.fnThatBreaksAsyncData()
     // composable.fnThatBreaksAsyncData({ isDev: false }) // with a default param we can avoid the failure
 
-    const { user } = await composable.fetchData()
-    store.userFromApi = user
-    return { user }
+    if (!store.userFromApi) {
+      const { user } = await composable.fetchData()
+      store.userFromApi = user
+    }
+    return { user: store.userFromApi }
   }
 })
 </script>
