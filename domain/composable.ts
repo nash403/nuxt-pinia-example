@@ -1,5 +1,12 @@
 import { ref, useContext } from "@nuxtjs/composition-api"
 
+export interface User {
+    name: string;
+    coucou: {
+        foo: string;
+    };
+}
+
 export const useComposable = () => {
   const counter = ref(0)
 

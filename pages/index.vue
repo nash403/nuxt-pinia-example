@@ -40,19 +40,12 @@
 </template>
 
 <script lang="ts">
-import { ssrRef, defineComponent, useRoute, getCurrentInstance, computed } from '@nuxtjs/composition-api'
+import { ssrRef, defineComponent, useRoute, computed } from '@nuxtjs/composition-api'
 import { useStore } from "~/domain/store";
-import { useComposable } from "~/domain/composable";
+import { useComposable, User } from "~/domain/composable";
+import { useVmData } from "~/domain/vm";
 
 const myGlobalRef = ssrRef('my-ref-value') // to test cross-user server state pollution
-
-const useVmData = () => { // helper composable for current instance data
-  const vm = getCurrentInstance()
-  return {
-    vm,
-    vmData: computed(() => vm?.data || {})
-  }
-}
 
 export default defineComponent({
   setup() {
@@ -66,12 +59,11 @@ export default defineComponent({
       myGlobalRef.value = route.value.query.ref as string
       aStore.setString(route.value.query.ref as string)
     }
-
-    const { vmData } = useVmData() // to get info returned from asyncData
+    const { vmData } = useVmData<{ user: User }>() // to get info returned from asyncData with type completion
 
     // example of computed with data coming from asyncData
     const userNameWithCount = computed(() => {
-      const userName = (vmData.value.user as any)?.name // fields of vm.data will not be properly typed so the cast is necessary
+      const userName = vmData.value.user.name
       return `${userName} (count: ${counter.value})`
     })
 
@@ -79,6 +71,7 @@ export default defineComponent({
     const changeUser = async () => {
       const { user } = await fetchData(true)
       vmData.value.user = user
+      // Object.assign(vmData.value, { user }) // Use Object.assign() to replace multiple properties of vm.data at the same time
       console.log(`user changed to ${user.name}`)
     }
 
@@ -109,7 +102,7 @@ export default defineComponent({
     // composable.fnThatBreaksAsyncData()
     // composable.fnThatBreaksAsyncData({ isDev: false }) // with a default param we can avoid the failure
 
-    if (!store.userFromApi) {
+    if (!store.userFromApi.name) {
       const { user } = await composable.fetchData()
       store.userFromApi = user
     }
